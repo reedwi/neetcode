@@ -34,7 +34,7 @@ Constraints:
 ```
 
 My first approach using built-in python functionality to complete. This will work fine, but is not super memory efficient as I am creating a set on top of the list that is passed. It is very fast though.
-```
+```python
 from typing import List
 class Solution:
     def contains_duplicate_set(self, nums: List[int]) -> bool:
@@ -46,7 +46,7 @@ class Solution:
 ```
 
 Second approach uses a set that I add to as I iterate. If the number is in the set then we know it is a duplicate, if not in the set we add the number to the set
-```
+```python
     def contains_duplicate_hashset(self, nums: List[int]) -> bool:
         seen_nums = set()
         for num in nums:
@@ -82,7 +82,7 @@ s and t consist of lowercase English letters.
 ```
 
 My first approach again leverages python built-in features. This clears, but will be a better way using a different approach
-```
+```python
 class Solution:
     def isAnagram(self, s: str, t: str) -> bool:
         sorted_s = sorted(s)
@@ -92,7 +92,7 @@ class Solution:
 ```
 
 Second approach uses a hash to count the occurences of characters and then checks to see if the characters counts are equakl between the 2
-```
+```python
     def isAnagramHash(self, s: str, t: str) -> bool:
         char_count = defaultdict(int)
 
@@ -109,7 +109,7 @@ Second approach uses a hash to count the occurences of characters and then check
         return True
 ```
 Third approach uses a built-in python object I was not familiar with "Counter". The Counter class will essentially do a very similar implementation to what I am doing in the prior attempt. It will make keys of all the items in the iterable and then count how many times they appear as the value of the dict.
-```
+```python
     def isAnagramCounter(self, s: str, t: str) -> bool:
         s_counter = Counter(s)
         t_counter = Counter(t)
@@ -152,7 +152,7 @@ Constraints:
 Only one valid answer exists.
 ```
 Using a hash map to collect the value and index of numbers. We look for the number needed to get to the target number. If the number needed is in our map, then we return the current index and get the index from the hash map of the number needed
-```
+```python
 from typing import List
 class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
@@ -193,7 +193,7 @@ Constraints:
 strs[i] consists of lowercase English letters.
 ```
 First pass is taking similar approach to the first anagram problem. Keeping a seen map, but instead of a singular value with a key, it is now a list of values with the key
-```
+```python
 from typing import List
 from collections import Counter, defaultdict
 class Solution:
@@ -230,7 +230,7 @@ k is in the range [1, the number of unique elements in the array].
 It is guaranteed that the answer is unique.
 ```
 First go that is bvery efficient is a full python built-in way using Counter and OrderedDict. It works well
-```
+```python
 from typing import List
 from collections import Counter, OrderedDict
 class Solution:
@@ -240,7 +240,7 @@ class Solution:
         return list(sorted_counter.keys())
 ```
 A way that shows actual understanding of what's going on underneath, but would go full Python in an actual implementation. This uses a hash map again to get the values, then sorts and gets the necessary values
-```
+```python
     def topKFrequentForce(self, nums: List[int], k: int) -> List[int]:
         count_map = defaultdict(int)
         for num in nums:
