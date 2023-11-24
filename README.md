@@ -5,6 +5,7 @@
 ![neetcode map](/assets/neetcode-map.png)
 
 1. [Arrays & Hashing](##Arrays-&-Hashing)
+2. [Two Pointers](##Two-Pointers)
 
 
 ## Arrays & Hashing
@@ -282,4 +283,304 @@ Constraints:
 2 <= nums.length <= 105
 -30 <= nums[i] <= 30
 The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.
+```
+Used a prefix and postfix solution. Loops through and calucalte the product of all elements to the left of i.
+
+Then loop through in reverse and calculate the product of all elements to the right of i and multiply by the value retrieved from left of i.
+```python
+from typing import List
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        answer = [1] * len(nums)
+
+        left = 1
+        for i in range(len(nums)):
+            answer[i] = left
+            left *= nums[i]
+
+        right = 1
+        for i in range(len(nums) - 1, -1, -1):
+            answer[i] *= right
+            right *= nums[i]
+        return answer
+```
+
+### Valid Sudoku
+```
+Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+Each row must contain the digits 1-9 without repetition.
+Each column must contain the digits 1-9 without repetition.
+Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+Note:
+
+A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+Only the filled cells need to be validated according to the mentioned rules.
+
+Input: board = 
+[["5","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: true
+Example 2:
+
+Input: board = 
+[["8","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: false
+Explanation: Same as Example 1, except with the 5 in the top left corner being modified to 8. Since there are two 8's in the top left 3x3 sub-box, it is invalid.
+```
+Took me awhile, but figured out how to do in one sweep. Used a defaultdict with a set as a value.
+1. Iterate through every number
+2. If not a number continue on
+3. Based on the number and position, check to see if it is in my dictionary. I.e. on position (0, 2) for rows it will look for a dict key of 0 and check to see if the set contains the num. Does the same for columns
+4. Then determine the square it is in using floor division. Can generate square it is in and do the same set calculation
+
+```python
+from typing import List
+from collections import defaultdict
+class Solution:
+    def isValidSudoku(self, board: List[List[str]]) -> bool:
+        rows = defaultdict(set)
+        cols = defaultdict(set)
+        squares = defaultdict(set)
+        for row in range(9):
+            for col in range(9):
+                num = board[row][col]
+                if board[row][col] == '.':
+                    continue
+
+                if num in rows[row]:
+                    return False
+                else:
+                    rows[row].add(num)
+
+                if num in cols[col]:
+                    return False
+                else:
+                    cols[col].add(num)
+
+                square_section = (row // 3, col // 3)
+                if num in squares[square_section]:
+                    return False
+                else:
+                    squares[square_section].add(num)
+        return True
+```
+### Encode and Decode Strings
+```
+Description
+Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.
+
+Please implement encode and decode
+
+Example
+Example1
+
+Input: ["lint","code","love","you"]
+Output: ["lint","code","love","you"]
+Explanation:
+One possible encode method is: "lint:;code:;love:;you"
+Example2
+
+Input: ["we", "say", ":", "yes"]
+Output: ["we", "say", ":", "yes"]
+Explanation:
+One possible encode method is: "we:;say:;:::;yes"
+```
+
+```python
+    def encode(self, strs):
+        encoded = ''
+        for s in strs:
+            if s != ':':
+                encoded += s + ':;'
+            else:
+                encoded += ':' + s + ':;'
+        return encoded
+
+
+    def decode(self, str):
+        # write your code here
+        result = []
+        buf = ''
+        skip = False
+
+        for s in range(len(str)):
+            if skip:
+                skip = False
+                continue
+
+            if str[s] != ':':
+                buf += str[s]
+            elif str[s] == ':' and str[s+1] == ';':
+                result.append(buf)
+                buf = ''
+                skip = True
+            elif str[s] == ':' and str[s+1] == ':':
+                buf += ':'
+                skip = True
+        return result
+```
+
+### Longest Consecutive Sequence
+[leetcode](https://leetcode.com/problems/longest-consecutive-sequence/)
+```
+Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in O(n) time.
+
+ 
+
+Example 1:
+
+Input: nums = [100,4,200,1,3,2]
+Output: 4
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+Example 2:
+
+Input: nums = [0,3,7,2,5,8,4,6,0,1]
+Output: 9
+```
+1. Made a set to remove duplicates. 
+2. Converted back to a list so it could then be ordered. 
+3. Loop through list and check to see if the next value in the list is equal to the current value + 1. 
+4. if it is then add to current_count, if not mark it to end the current streak
+5. If current_count > longest streak, then set longest to current_count
+6. If it is marked to end then set current_count back to 1
+
+```python
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        nums = list(set(nums))
+        nums.sort()
+        if nums:
+            longest = 1
+        else:
+            longest = 0
+        current_count = 1
+        end = False
+
+        for i in range(len(nums) - 1):
+            if nums[i] + 1 == nums[i+1]:
+                current_count += 1
+            else:
+                end = True
+
+            if current_count > longest:
+                longest = current_count
+            
+            if end:
+                current_count = 1
+                end = False
+        return longest
+```
+
+## Two Pointers
+### Valid Palindrome
+[leetcode](https://leetcode.com/problems/valid-palindrome/)
+```
+A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+Given a string s, return true if it is a palindrome, or false otherwise.
+
+ 
+
+Example 1:
+
+Input: s = "A man, a plan, a canal: Panama"
+Output: true
+Explanation: "amanaplanacanalpanama" is a palindrome.
+Example 2:
+
+Input: s = "race a car"
+Output: false
+Explanation: "raceacar" is not a palindrome.
+Example 3:
+
+Input: s = " "
+Output: true
+Explanation: s is an empty string "" after removing non-alphanumeric characters.
+Since an empty string reads the same forward and backward, it is a palindrome.
+```
+
+### Two Sum Input Array is Sorted
+```
+Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 < numbers.length.
+
+Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.
+
+The tests are generated such that there is exactly one solution. You may not use the same element twice.
+
+Your solution must use only constant extra space.
+
+ 
+
+Example 1:
+
+Input: numbers = [2,7,11,15], target = 9
+Output: [1,2]
+Explanation: The sum of 2 and 7 is 9. Therefore, index1 = 1, index2 = 2. We return [1, 2].
+Example 2:
+
+Input: numbers = [2,3,4], target = 6
+Output: [1,3]
+Explanation: The sum of 2 and 4 is 6. Therefore index1 = 1, index2 = 3. We return [1, 3].
+Example 3:
+
+Input: numbers = [-1,0], target = -1
+Output: [1,2]
+Explanation: The sum of -1 and 0 is -1. Therefore index1 = 1, index2 = 2. We return [1, 2].
+ 
+
+Constraints:
+
+2 <= numbers.length <= 3 * 104
+-1000 <= numbers[i] <= 1000
+numbers is sorted in non-decreasing order.
+-1000 <= target <= 1000
+The tests are generated such that there is exactly one solution.
+```
+
+### 3 Sum
+```
+Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+Notice that the solution set must not contain duplicate triplets.
+
+ 
+
+Example 1:
+
+Input: nums = [-1,0,1,2,-1,-4]
+Output: [[-1,-1,2],[-1,0,1]]
+Explanation: 
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+The distinct triplets are [-1,0,1] and [-1,-1,2].
+Notice that the order of the output and the order of the triplets does not matter.
+Example 2:
+
+Input: nums = [0,1,1]
+Output: []
+Explanation: The only possible triplet does not sum up to 0.
+Example 3:
+
+Input: nums = [0,0,0]
+Output: [[0,0,0]]
+Explanation: The only possible triplet sums up to 0.
 ```
